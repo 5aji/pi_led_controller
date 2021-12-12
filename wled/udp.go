@@ -11,7 +11,7 @@ import (
 // This function takes a slice of Wled Colors and creates a byte
 // array for sending.
 func mapToBytes(colors *[]WledColor, buf *[]byte) {
-	*buf =	(*buf)[:2]
+	*buf =	(*buf)[:2] // trim off excess bits.
 
 	for _, color := range *colors {
 		*buf = append(*buf, color[0], color[1], color[2])

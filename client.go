@@ -5,7 +5,7 @@ import (
 	"time"
 	// "os"
 
-	"github.com/kschamplin/wledkeeb/wled"
+	"github.com/kschamplin/pi_led_controller/wled"
 )
 
 func main() {

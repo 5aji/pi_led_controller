@@ -78,5 +78,34 @@ func (color *RGB) HSL() HSL {
 }
 
 
+func (color *HSL) RGB() RGB {
+	C := (1 - math.Abs(2 * color.L - 1)) * color.S
+	X := C * (1 - math.Abs(math.Mod(color.H / 6, 2) - 1))
+	m := color.L - C/2
+
+	var r, g, b float64
+
+	switch {
+	case color.H < 1/6:
+		r,g,b = C, X, 0
+	case color.H < 1/3:
+		r,g,b = X, C, 0
+	case color.H < 3/6:
+		r,g,b = 0,C,X
+	case color.H < 4/6:
+		r,g,b = 0, X, C
+	case color.H < 5/6:
+		r,g,b = X, 0, C
+	case color.H < 1:
+		r,g,b = C,0,X
+	default:
+		r,g,b = 0,0,0
+		panic("problem converting HSL")
+	}
+
+	newColor := RGB{r + m, g+m, b+m}
+
+	return newColor
+}
 
 

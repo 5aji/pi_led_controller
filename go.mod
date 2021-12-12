@@ -1,4 +1,4 @@
-module github.com/kschamplin/wledkeeb
+module github.com/kschamplin/pi_led_controller
 
 go 1.17
 
