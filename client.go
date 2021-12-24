@@ -2,13 +2,35 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"time"
+
 	// "os"
 
-	"github.com/kschamplin/pi_led_controller/wled"
+	"math/rand"
+
+	"github.com/kschamplin/pi_led_controller/lib/wled"
+	"github.com/lucasb-eyer/go-colorful"
 )
 
+
+const framerate float64 = 60
+const delta = 1
+
+// takes a pointer to an array of wled colors and sets 
+// all the colors to the provided colorful color
+func setLeds(leds *[]wled.WledColor, color colorful.Color) {
+
+	wColor := wled.ToWled(color)
+
+	for i := range *leds {
+		(*leds)[i] = wColor
+	}
+
+}
+
 func main() {
+	rand.Seed(time.Now().UTC().UnixNano())
 	addr := "172.16.21.155"
 
 	// state := os.Args[1]
@@ -49,24 +71,29 @@ func main() {
 	data := make(chan *[]wled.WledColor)
 	done := wled.StreamLights(addr, data)
 
-	testColor := make([]wled.WledColor, 300)
+	leds := make([]wled.WledColor, 300)
 
-	fmt.Println("sending data")
-	for i := range testColor {
-		var color wled.WledColor
-		if i < 150 {
-			color = wled.WledColor{0,0,0}
-		} else {
-			color = wled.WledColor{255,255,255}
+	ticker := time.NewTicker(time.Second / time.Duration(framerate))
+
+
+	fmt.Printf("starting data")
+
+	defer func() {done <- true}()
+	var angle float64 = 0
+	var color colorful.Color = colorful.Hsv(angle, 1,1)
+	for {
+		select {
+		case <-ticker.C:
+			// update color
+			angle = math.Mod(angle + delta, 360)
+			color = colorful.Hsv(angle, 1,1)
+			setLeds(&leds, color)
+			data <- &leds
 		}
-		testColor[i] = color
 	}
+			
 
-	data <- &testColor
-	fmt.Println("all data sent, waiting")
-	time.Sleep(5 * time.Second)
 
 	// wled.SetWledState(addr, wled.SetWledLights(false))
-	done <- true
 	
 }
